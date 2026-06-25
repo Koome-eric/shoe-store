@@ -127,6 +127,7 @@ model Category {
   store    Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
   name     String
   slug     String
+  imageUrl String?
   parentId String?
   parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryToCategory")

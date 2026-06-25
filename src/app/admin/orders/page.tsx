@@ -35,7 +35,10 @@ export default function AdminOrdersPage() {
   if (search) query.set("q", search);
   if (status !== "ALL") query.set("status", status);
 
-  const { data: orders, isLoading } = useSWR<OrderRow[]>(`/api/admin/orders?${query.toString()}`, fetcher);
+  const { data: orders, isLoading } = useSWR<OrderRow[]>(
+    `/api/admin/orders?${query.toString()}`,
+    fetcher
+  );
 
   return (
     <div>
@@ -43,7 +46,7 @@ export default function AdminOrdersPage() {
       <p className="mt-1 text-sm text-muted-foreground">View and manage customer orders.</p>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div className="relative w-full max-w-sm">
+        <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search by order #, name, or phone…"
@@ -53,7 +56,7 @@ export default function AdminOrdersPage() {
           />
         </div>
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -71,7 +74,37 @@ export default function AdminOrdersPage() {
         </Select>
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-md border border-border bg-card">
+      {/* ── Mobile card list ── */}
+      <div className="mt-6 space-y-3 lg:hidden">
+        {isLoading &&
+          Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-md" />
+          ))}
+        {!isLoading && orders?.length === 0 && (
+          <p className="py-10 text-center text-muted-foreground">No orders found.</p>
+        )}
+        {orders?.map((order) => (
+          <Link
+            key={order.id}
+            href={`/admin/orders/${order.id}`}
+            className="block rounded-md border border-border bg-card p-4 hover:border-clay/50 transition-colors"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <span className="font-mono font-medium text-clay">{order.orderNumber}</span>
+              <Badge variant={STATUS_VARIANT[order.status]}>{order.status.replace("_", " ")}</Badge>
+            </div>
+            <p className="mt-1.5 text-sm font-medium">{order.guestName}</p>
+            <p className="text-xs text-muted-foreground">{order.guestPhone}</p>
+            <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+              <span>{formatDateTime(order.createdAt)}</span>
+              <span className="font-semibold text-foreground">{formatKES(order.total)}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* ── Desktop table ── */}
+      <div className="mt-6 hidden overflow-x-auto rounded-md border border-border bg-card lg:block">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-bone-deep text-left text-xs font-bold uppercase tracking-wide text-muted-foreground">
             <tr>
@@ -93,7 +126,6 @@ export default function AdminOrdersPage() {
                   </td>
                 </tr>
               ))}
-
             {!isLoading && orders?.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
@@ -101,7 +133,6 @@ export default function AdminOrdersPage() {
                 </td>
               </tr>
             )}
-
             {orders?.map((order) => (
               <tr key={order.id} className="hover:bg-bone-deep/50">
                 <td className="px-4 py-3">
@@ -116,7 +147,9 @@ export default function AdminOrdersPage() {
                 <td className="px-4 py-3 text-muted-foreground">{formatDateTime(order.createdAt)}</td>
                 <td className="px-4 py-3">{order.items.length}</td>
                 <td className="px-4 py-3 font-medium">{formatKES(order.total)}</td>
-                <td className="px-4 py-3 text-muted-foreground">{order.payments[0]?.method === "MPESA" ? "M-Pesa" : "COD"}</td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {order.payments[0]?.method === "MPESA" ? "M-Pesa" : "COD"}
+                </td>
                 <td className="px-4 py-3">
                   <Badge variant={STATUS_VARIANT[order.status]}>{order.status.replace("_", " ")}</Badge>
                 </td>

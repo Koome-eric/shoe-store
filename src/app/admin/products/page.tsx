@@ -36,45 +36,70 @@ export default function AdminProductsPage() {
   );
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Delete "${name}"? This can't be undone unless the product has order history, in which case it will be archived instead.`)) {
-      return;
-    }
+    if (!confirm(`Delete "${name}"? This can't be undone unless the product has order history, in which case it will be archived instead.`)) return;
     const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      toast.success("Product removed");
-      mutate();
-    } else {
-      toast.error("Failed to delete product");
-    }
+    if (res.ok) { toast.success("Product removed"); mutate(); }
+    else toast.error("Failed to delete product");
   }
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight">Products</h1>
           <p className="mt-1 text-sm text-muted-foreground">Manage your catalog, variants, and stock.</p>
         </div>
         <Button asChild>
-          <Link href="/admin/products/new">
-            <Plus className="h-4 w-4" /> Add Product
-          </Link>
+          <Link href="/admin/products/new"><Plus className="h-4 w-4" /> Add Product</Link>
         </Button>
       </div>
 
       <div className="mt-6 flex items-center gap-2">
-        <div className="relative w-full max-w-sm">
+        <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search products…"
-            className="pl-9"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <Input placeholder="Search products…" className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-md border border-border bg-card">
+      {/* ── Mobile card list ── */}
+      <div className="mt-6 space-y-3 lg:hidden">
+        {isLoading && Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-md" />)}
+        {!isLoading && products?.length === 0 && (
+          <p className="py-10 text-center text-muted-foreground">
+            No products yet.{" "}
+            <Link href="/admin/products/new" className="font-semibold text-clay hover:underline">Add your first product</Link>
+          </p>
+        )}
+        {products?.map((product) => {
+          const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
+          return (
+            <div key={product.id} className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-sm bg-bone-deep">
+                {product.images[0] && <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{product.name}</p>
+                <p className="text-xs text-muted-foreground">{formatKES(product.sellingPrice)} · Stock: {totalStock}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <Badge variant={STATUS_VARIANT[product.status]}>{product.status}</Badge>
+                  {product.category && <span className="text-xs text-muted-foreground">{product.category.name}</span>}
+                </div>
+              </div>
+              <div className="flex shrink-0 gap-1">
+                <Button size="icon" variant="ghost" asChild className="h-8 w-8">
+                  <Link href={`/admin/products/${product.id}`}><Pencil className="h-4 w-4" /></Link>
+                </Button>
+                <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleDelete(product.id, product.name)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Desktop table ── */}
+      <div className="mt-6 hidden overflow-x-auto rounded-md border border-border bg-card lg:block">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-bone-deep text-left text-xs font-bold uppercase tracking-wide text-muted-foreground">
             <tr>
@@ -87,26 +112,15 @@ export default function AdminProductsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {isLoading &&
-              Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i}>
-                  <td colSpan={6} className="px-4 py-3">
-                    <Skeleton className="h-10 w-full" />
-                  </td>
-                </tr>
-              ))}
-
+            {isLoading && Array.from({ length: 5 }).map((_, i) => (
+              <tr key={i}><td colSpan={6} className="px-4 py-3"><Skeleton className="h-10 w-full" /></td></tr>
+            ))}
             {!isLoading && products?.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
-                  No products yet.{" "}
-                  <Link href="/admin/products/new" className="font-semibold text-clay hover:underline">
-                    Add your first product
-                  </Link>
-                </td>
-              </tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                No products yet.{" "}
+                <Link href="/admin/products/new" className="font-semibold text-clay hover:underline">Add your first product</Link>
+              </td></tr>
             )}
-
             {products?.map((product) => {
               const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
               return (
@@ -114,9 +128,7 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-sm bg-bone-deep">
-                        {product.images[0] && (
-                          <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />
-                        )}
+                        {product.images[0] && <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />}
                       </div>
                       <div>
                         <p className="font-medium">{product.name}</p>
@@ -127,23 +139,13 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3 text-muted-foreground">{product.category?.name ?? "—"}</td>
                   <td className="px-4 py-3">{formatKES(product.sellingPrice)}</td>
                   <td className="px-4 py-3">
-                    <span className={totalStock === 0 ? "text-destructive" : totalStock <= 10 ? "text-clay" : ""}>
-                      {totalStock}
-                    </span>
+                    <span className={totalStock === 0 ? "text-destructive" : totalStock <= 10 ? "text-clay" : ""}>{totalStock}</span>
                   </td>
-                  <td className="px-4 py-3">
-                    <Badge variant={STATUS_VARIANT[product.status]}>{product.status}</Badge>
-                  </td>
+                  <td className="px-4 py-3"><Badge variant={STATUS_VARIANT[product.status]}>{product.status}</Badge></td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <Button size="icon" variant="ghost" asChild>
-                        <Link href={`/admin/products/${product.id}`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDelete(product.id, product.name)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <Button size="icon" variant="ghost" asChild><Link href={`/admin/products/${product.id}`}><Pencil className="h-4 w-4" /></Link></Button>
+                      <Button size="icon" variant="ghost" onClick={() => handleDelete(product.id, product.name)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </div>
                   </td>
                 </tr>

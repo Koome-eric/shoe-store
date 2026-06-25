@@ -31,15 +31,15 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight">Order #{order.orderNumber}</h1>
+          <h1 className="font-display text-xl font-bold tracking-tight sm:text-2xl">Order #{order.orderNumber}</h1>
           <p className="mt-1 text-sm text-muted-foreground">Placed {formatDateTime(order.createdAt)}</p>
         </div>
         <Badge>{order.status.replace("_", " ")}</Badge>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <Card>
             <CardHeader>

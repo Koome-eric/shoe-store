@@ -18,6 +18,7 @@ export async function GET() {
 const createSchema = z.object({
   name: z.string().min(2),
   parentId: z.string().optional().nullable(),
+  imageUrl: z.string().url().optional().nullable(),
 });
 
 export async function POST(req: Request) {
@@ -32,7 +33,14 @@ export async function POST(req: Request) {
   const slug = slugify(parsed.data.name);
 
   const category = await prisma.category.create({
-    data: { storeId, name: parsed.data.name, slug, parentId: parsed.data.parentId || null },
+    data: {
+      storeId,
+      name: parsed.data.name,
+      slug,
+      parentId: parsed.data.parentId || null,
+      // @ts-expect-error — imageUrl added in schema; run `prisma db push` to sync the client
+      imageUrl: parsed.data.imageUrl || null,
+    },
   });
 
   return NextResponse.json(category, { status: 201 });
