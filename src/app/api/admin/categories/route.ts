@@ -38,7 +38,6 @@ export async function POST(req: Request) {
       name: parsed.data.name,
       slug,
       parentId: parsed.data.parentId || null,
-      // @ts-expect-error — imageUrl added in schema; run `prisma db push` to sync the client
       imageUrl: parsed.data.imageUrl || null,
     },
   });
