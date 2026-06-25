@@ -1,0 +1,122 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  /* Brand palette — Savanna Leather */
+  --bone: #F7F3EA;
+  --bone-deep: #EFE8D8;
+  --ink: #241F1A;
+  --forest: #1A2E22;
+  --forest-light: #2B4534;
+  --clay: #C2491D;
+  --clay-light: #DD6638;
+  --ochre: #E8A33D;
+  --line: #DCD3BE;
+
+  --background: var(--bone);
+  --foreground: var(--ink);
+
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+
+  --primary: var(--clay);
+  --primary-foreground: var(--bone);
+
+  --secondary: var(--forest);
+  --secondary-foreground: var(--bone);
+
+  --muted: var(--bone-deep);
+  --muted-foreground: #6B6253;
+
+  --accent: var(--ochre);
+  --accent-foreground: var(--ink);
+
+  --destructive: #B3261E;
+  --destructive-foreground: #ffffff;
+
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--clay);
+
+  --radius: 0.25rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-bone: var(--bone);
+  --color-bone-deep: var(--bone-deep);
+  --color-ink: var(--ink);
+  --color-forest: var(--forest);
+  --color-forest-light: var(--forest-light);
+  --color-clay: var(--clay);
+  --color-clay-light: var(--clay-light);
+  --color-ochre: var(--ochre);
+  --color-line: var(--line);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+}
+
+@layer utilities {
+  /* Size-ruler tick divider — the signature structural device.
+     Evokes a shoe-size chart: a baseline with graduated ticks. */
+  .ruler-divider {
+    position: relative;
+    height: 1px;
+    background: var(--line);
+  }
+  .ruler-divider::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--ink) 0,
+      var(--ink) 1px,
+      transparent 1px,
+      transparent 24px
+    );
+    opacity: 0.18;
+    height: 6px;
+    top: -2px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
