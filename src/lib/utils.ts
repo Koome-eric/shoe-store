@@ -82,6 +82,6 @@ export function isValidKenyanPhone(phone: string): boolean {
 
 /** Builds a wa.me link with a prefilled message, used for "Order via WhatsApp" CTAs. */
 export function buildWhatsAppLink(message: string, phone?: string) {
-  const number = phone || process.env.NEXT_PUBLIC_STORE_WHATSAPP || "254700000000";
+  const number = phone || process.env.NEXT_PUBLIC_STORE_WHATSAPP || "254710570935";
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }

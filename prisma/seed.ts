@@ -24,7 +24,7 @@ async function main() {
       name: "Savanna & Sole",
       slug: "savanna-sole",
       currency: "KES",
-      whatsapp: process.env.STORE_WHATSAPP_NUMBER || "254700000000",
+      whatsapp: process.env.STORE_WHATSAPP_NUMBER || "254710570935",
       email: "hello@savannasole.co.ke",
     },
   });

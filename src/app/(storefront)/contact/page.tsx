@@ -27,7 +27,7 @@ const channels = [
   {
     icon: MessageCircle,
     label: "WhatsApp",
-    value: "+254 700 000 000",
+    value: "+254 710 570 935",
     note: "Fastest response — Mon–Sat, 8 am–7 pm",
     href: buildWhatsAppLink("Hi! I have a question about Savanna & Sole."),
     external: true,
